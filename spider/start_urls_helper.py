@@ -5,6 +5,7 @@ start_urls.py的辅助函数
 @time: 2018/10/23 18:48
 Created by Junyi.
 """
+from requests_html import HTMLSession
 
 
 def parse_baidu_response(response):
@@ -100,3 +101,48 @@ def _get_bing_next_page_url(html):
     except TypeError:
         next_page_url = None
     return next_page_url
+
+
+def get_target_start_urls(url_template, keyword, parse_func, amount):
+    """
+    获取指定搜索引擎的start_urls
+    :param url_template: 指定搜索引擎的url模板
+    :param keyword: 搜索关键词
+    :param parse_func: 使用的解析函数
+    :param amount: 需要的start_urls数量
+    :return: ->start_urls(list)
+    """
+    start_urls = []
+    search_url = url_template.format(keyword)
+    urls, next_page_url = _get_one_page_start_urls(search_url, parse_func=parse_func)
+    while len(start_urls) < amount:
+        if urls:
+            start_urls.extend(urls)
+            if not next_page_url:
+                break
+            urls, next_page_url = _get_one_page_start_urls(next_page_url, parse_func=parse_func)
+        else:
+            break
+    return start_urls
+
+
+def _get_one_page_start_urls(search_url, parse_func, retry_times=0):
+    """
+    通过一页的搜索结果，获取起始地址
+    :param search_url: 关键词
+    :param parse_func: 解析函数
+    :param retry_times: 特殊情况无法获得请求信息，当前重试次数（设置最大重试次数为5次）
+    :return: ->start_urls(list)
+    """
+    start_urls = []
+    session = HTMLSession()
+    response = session.get(search_url)
+    if response.status_code == 200:
+        urls, next_page_url = parse_func(response)
+        start_urls.extend(urls)
+    elif retry_times <= 5:
+        retry_times += 1
+        _get_one_page_start_urls(search_url, parse_func, retry_times)
+    else:
+        next_page_url = None
+    return start_urls, next_page_url
