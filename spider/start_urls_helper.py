@@ -39,7 +39,8 @@ def parse_sogou_response(response):
         search_results_list = html.absolute_links
         for search_result in search_results_list:
             if 'https://www.sogou.com/link?url=' in search_result:
-                starts_urls.append(search_result)
+                real_url = _get_sogou_real_url(search_result)
+                starts_urls.append(real_url)
         next_page_url = _get_sogou_next_page_url(html)
     return starts_urls, next_page_url
 
@@ -89,6 +90,18 @@ def _get_sogou_next_page_url(html):
     return next_page_url
 
 
+def _get_sogou_real_url(search_result_url):
+    """
+    搜狗的搜索结果需要二次请求获取网站真实url
+    :param search_result_url: 解析出的直接搜索结果url
+    :return: ->real_url(str)
+    """
+    sess = HTMLSession()
+    response = sess.get(search_result_url)
+    real_url = response.html.text.split('\"')[1]
+    return real_url
+
+
 def _get_bing_next_page_url(html):
     """
     获取必应搜索下一页结果的url
@@ -101,27 +114,6 @@ def _get_bing_next_page_url(html):
     except TypeError:
         next_page_url = None
     return next_page_url
-
-
-def get_target_start_urls(url_template, keyword, parse_func, amount):
-    """
-    获取指定搜索引擎的start_urls
-    :param url_template: 指定搜索引擎的url模板
-    :param keyword: 搜索关键词
-    :param parse_func: 使用的解析函数
-    :param amount: 需要的start_urls数量
-    :return: ->start_urls(list)
-    """
-    start_urls = []
-    search_url = url_template.format(keyword)
-    urls, next_page_url = _get_one_page_start_urls(search_url, parse_func=parse_func)
-    if urls:
-        start_urls.extend(urls)
-    while len(start_urls) < amount and next_page_url:
-        urls, next_page_url = _get_one_page_start_urls(next_page_url, parse_func=parse_func)
-        if urls:
-            start_urls.extend(urls)
-    return start_urls
 
 
 def _get_one_page_start_urls(search_url, parse_func, retry_times=0):
@@ -145,3 +137,23 @@ def _get_one_page_start_urls(search_url, parse_func, retry_times=0):
         next_page_url = None
     return start_urls, next_page_url
 
+
+def get_target_start_urls(url_template, keyword, parse_func, amount):
+    """
+    获取指定搜索引擎的start_urls
+    :param url_template: 指定搜索引擎的url模板
+    :param keyword: 搜索关键词
+    :param parse_func: 使用的解析函数
+    :param amount: 需要的start_urls数量
+    :return: ->start_urls(list)
+    """
+    start_urls = []
+    search_url = url_template.format(keyword)
+    urls, next_page_url = _get_one_page_start_urls(search_url, parse_func=parse_func)
+    if urls:
+        start_urls.extend(urls)
+    while len(start_urls) < amount and next_page_url:
+        urls, next_page_url = _get_one_page_start_urls(next_page_url, parse_func=parse_func)
+        if urls:
+            start_urls.extend(urls)
+    return start_urls

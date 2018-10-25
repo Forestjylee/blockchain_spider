@@ -6,9 +6,8 @@ name = "pypi"
 [packages]
 requests-html = "*"
 pymongo = "*"
-requests = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
