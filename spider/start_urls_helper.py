@@ -115,14 +115,12 @@ def get_target_start_urls(url_template, keyword, parse_func, amount):
     start_urls = []
     search_url = url_template.format(keyword)
     urls, next_page_url = _get_one_page_start_urls(search_url, parse_func=parse_func)
-    while len(start_urls) < amount:
+    if urls:
+        start_urls.extend(urls)
+    while len(start_urls) < amount and next_page_url:
+        urls, next_page_url = _get_one_page_start_urls(next_page_url, parse_func=parse_func)
         if urls:
             start_urls.extend(urls)
-            if not next_page_url:
-                break
-            urls, next_page_url = _get_one_page_start_urls(next_page_url, parse_func=parse_func)
-        else:
-            break
     return start_urls
 
 
@@ -146,3 +144,4 @@ def _get_one_page_start_urls(search_url, parse_func, retry_times=0):
     else:
         next_page_url = None
     return start_urls, next_page_url
+
