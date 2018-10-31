@@ -6,24 +6,33 @@
 Created by Junyi.
 """
 from multiprocessing import Pool
-from .redis_queue import RedisQueue
-from .normal_queue import NormalQueue
-from .data_handler import get_crawl_urls
-from .requests_helper import request_url, first_parse_response
-
+from utils.parse_helper import ParseHelper
+from utils.requests_helper import request_url
+from url_queue.redis_queue import RedisQueue
+from url_queue.normal_queue import NormalQueue
+from pipline.mongo_pipline import MongoPipline
 
 class MultiProcessSpider(object):
 
-    def __init__(self, queue_type):
+    def __init__(self, queue_type, process_num=6):
         """
+        :param process_num: 同时执行的进程数
         :param queue_type: 共享队列类型(redis|normal|)
         """
+        self.process_num = process_num
         self.queue = self.__get_queue_object(queue_type)
-        self.__init_spider()
+        self.mongo_tube = MongoPipline()
+        self.__init_spider(queue_type)
 
-    def __init_spider(self):
-        crawl_urls = get_crawl_urls()
-        self.queue.put_urls_in_queue(crawl_urls)
+    def __init_spider(self, queue_type):
+        """
+        初始化爬虫队列
+        :param queue_type: 共享队列类型(redis|normal|)
+        :return: None
+        """
+        if queue_type == 'normal':
+            crawl_urls = self.mongo_tube.get_crawl_urls()
+            self.queue.put_urls_in_queue(crawl_urls)
 
     def crawl(self):
         """
@@ -33,17 +42,17 @@ class MultiProcessSpider(object):
         while True:
             url = self.queue.get_url_from_queue()
             response = request_url(url)
-            first_parsed_data = first_parse_response(response)
+            first_parsed_data = ParseHelper.first_parse_response(response)
             new_urls = first_parsed_data['urls'] if first_parsed_data else None
             self.queue.put_urls_in_queue(new_urls)
 
     def start_crawl(self):
         """
-        多进程调度函数
+        多进程调度函数(进程池实现)
         :return: None
         """
-        pool = Pool(processes=8)
-        for _ in range(8):
+        pool = Pool(processes=self.process_num)
+        for _ in range(self.process_num):
             pool.apply_async(self.crawl, args=(self.queue, ))
         pool.close()
         pool.join()

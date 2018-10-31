@@ -56,5 +56,7 @@ class RedisQueue(object):
         :param items: 需要push的元素
         :return: 队列当前长度
         """
-        for item in items:
-            yield self.redis_queue.rpush(self.queue_name, item)
+        if items:
+            for item in items[:-1]:
+                self.redis_queue.rpush(self.queue_name, item)
+            return self.redis_queue.rpush(self.queue_name, items[-1])

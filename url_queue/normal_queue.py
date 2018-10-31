@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-采用multiprocess.Manager的队列对象实现队列
+采用multiprocess.Manager的队列对象实现共享队列
 @file: normal_queue.py
 @time: 2018/10/31 15:56
 Created by Junyi.
@@ -9,7 +9,11 @@ from multiprocessing import Manager
 
 
 class NormalQueue(object):
-
+    """
+    使用multiprocess包的Manager对象的Lock和Queue实现队列
+    因为使用Pool进程池管理进程时，普通的Queue和multiprocess.Queue
+    均不能完成进行间通信的任务，所以封装了此类以便使用
+    """
     def __init__(self):
         manager = Manager()
         self.lock = manager.Lock()
@@ -38,8 +42,9 @@ class NormalQueue(object):
         :param items: 需要push的多个元素
         :return: None
         """
-        for item in items:
-            self.put_url_in_queue(item)
+        if items:
+            for item in items:
+                self.put_url_in_queue(item)
 
     def get_url_from_queue(self):
         """

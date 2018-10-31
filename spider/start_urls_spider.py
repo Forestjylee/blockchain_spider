@@ -11,8 +11,8 @@ Get 30 start_urls about '区块链' from baidu.
 @time: 2018/10/22 10:53
 Created by Junyi.
 """
-from .start_urls_helper import (parse_baidu_response, parse_sogou_response,
-                                parse_bing_response, get_target_start_urls)
+from utils.start_urls_helper import (parse_baidu_response,parse_sogou_response,
+                                     parse_bing_response,get_target_start_urls)
 
 BAIDU_URL_TEMPLATE = "https://www.baidu.com/s?ie=UTF-8&wd={}"
 
