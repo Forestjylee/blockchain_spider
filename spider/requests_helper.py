@@ -7,9 +7,10 @@ Created by Junyi.
 """
 from datetime import datetime
 from requests_html import HTMLSession
-from .data_handler import save_to_mongo
+from .data_handler import save_html_data_to_mongo
 
 #TODO 日志记录模块
+
 
 def request_url(url):
     """
@@ -28,6 +29,7 @@ def request_url(url):
 def first_parse_response(response):
     """
     初步解析response
+
     :param response: 网页返回的response
     :return: {'urls': 网页中所有链接, 'text':网页中的所有文本
               'datetime':datetime} | None
@@ -39,7 +41,7 @@ def first_parse_response(response):
                     'urls': absolute_links,
                     'text': text,
                     'datetime': str(datetime.now())}
-        save_to_mongo(data)    #TODO 插入mongoDB数据库
+        save_html_data_to_mongo(data)
         return data
     else:
         return None
