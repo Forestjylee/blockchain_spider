@@ -6,11 +6,11 @@
 Created by Junyi.
 """
 from multiprocessing import Pool
+from url_queue import get_queue_object
 from utils.parse_helper import ParseHelper
 from utils.requests_helper import request_url
-from url_queue.redis_queue import RedisQueue
-from url_queue.normal_queue import NormalQueue
 from pipline.mongo_pipline import MongoPipline
+# TODO logging日志模块初步定于在此添加
 
 class MultiProcessSpider(object):
 
@@ -20,7 +20,7 @@ class MultiProcessSpider(object):
         :param queue_type: 共享队列类型(redis|normal|)
         """
         self.process_num = process_num
-        self.queue = self.__get_queue_object(queue_type)
+        self.queue = get_queue_object(queue_type)
         self.mongo_tube = MongoPipline()
         self.__init_spider(queue_type)
 
@@ -56,17 +56,3 @@ class MultiProcessSpider(object):
             pool.apply_async(self.crawl, args=(self.queue, ))
         pool.close()
         pool.join()
-
-    @staticmethod
-    def __get_queue_object(queue_type):
-        """
-        获取共享url队列对象
-        :param queue_type:采用队列的类型
-        :return: ->queue object
-        """
-        if queue_type == 'redis':
-            return RedisQueue()
-        elif queue_type == 'normal':
-            return NormalQueue()
-        else:
-            return None

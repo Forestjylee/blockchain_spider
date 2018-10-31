@@ -52,7 +52,6 @@ class MongoPipline(object):
         """
         if self.__client[db_name][collection_name].update(
                 {'source_url': data['source_url']}, {'$set': data}, True):
-            #TODO logging记录日志
             return True
         else:
             return False
