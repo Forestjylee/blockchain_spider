@@ -6,8 +6,8 @@
 Created by Junyi.
 """
 from multiprocessing import Manager, Pool
-from .requests_helper import request_url, first_parse_response
 from .data_handler import get_crawl_urls
+from .requests_helper import request_url, first_parse_response
 
 #TODO redis数据库代替队列Queue
 
