@@ -50,7 +50,7 @@ class MongoPipline(object):
         :param db_name: mongoDB数据库名称
         :param data: 需要存储的数据
         :param collection_name: collect名称（概念类似SQL的表）
-        :param is_append: 是否以追加的形式的插入数据库
+        :param is_append: 是否以追加的形式插入数据库(default=False)
         :return: True || False
         """
         if data:
