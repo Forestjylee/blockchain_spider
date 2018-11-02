@@ -11,6 +11,7 @@ Get 30 start_urls about '区块链' from baidu.
 @time: 2018/10/22 10:53
 Created by Junyi.
 """
+from threading import Thread, RLock
 from utils.start_urls_helper import (parse_baidu_response,parse_sogou_response,
                                      parse_bing_response,get_target_start_urls)
 
@@ -73,3 +74,49 @@ def get_start_urls(search_engine, keyword, amount=10):
         return get_bing_start_urls(keyword, amount)
     else:
         raise AttributeError
+
+
+def build_start_urls_pool(keyword, queue_object=None,
+                          baidu_num=100, sogou_num=100):
+    """
+    创建起始地址池
+    :param keyword: 搜索关键词
+    :param queue_object: 队列对象(若无则不将结果放入队列)
+    :param baidu_num: 从百度搜索中提取的起始地址数
+    :param sogou_num: 从搜狗搜索中提取的起始地址数
+    :return: start_urls
+    """
+    start_urls = []
+    rlock = RLock()
+    thread1 = Thread(target=__crawl_start_urls,
+                    args=(start_urls, 'baidu',
+                          keyword, baidu_num, rlock))
+    thread2 = Thread(target=__crawl_start_urls,
+                     args=(start_urls, 'sogou',
+                           keyword, sogou_num, rlock))
+    thread1.setDaemon(False)
+    thread2.setDaemon(False)
+    thread1.start()
+    thread2.start()
+    thread1.join()
+    thread2.join()
+    start_urls = list(set(start_urls))
+    if queue_object:
+        queue_object.put_urls_in_queue(start_urls)
+    return start_urls
+
+
+def __crawl_start_urls(start_urls, search_engine, keyword, amount, rlock):
+    """
+    线程执行的任务
+    :param start_urls: 起始地址列表
+    :param search_engine: 使用的搜索引擎
+    :param keyword: 搜索关键字
+    :param amount: 需要的预期结果数量
+    :param rlock: 线程锁变量<threading.RLock>
+    :return: None
+    """
+    for urls in get_start_urls(search_engine, keyword, amount):
+        rlock.acquire()
+        start_urls.extend(urls)
+        rlock.release()

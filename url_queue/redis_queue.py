@@ -60,3 +60,13 @@ class RedisQueue(object):
             for item in items[:-1]:
                 self.redis_queue.rpush(self.queue_name, item)
             return self.redis_queue.rpush(self.queue_name, items[-1])
+
+    def is_queue_empty(self):
+        """
+        判断队列是否为空
+        :return: True | False
+        """
+        if self.get_queue_len():
+            return False
+        else:
+            return True

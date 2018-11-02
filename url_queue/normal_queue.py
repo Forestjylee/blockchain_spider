@@ -51,7 +51,17 @@ class NormalQueue(object):
         取出队列第一个元素
         :return: ->item | None(队列为空时)
         """
-        if not self.queue.empty():
-            return self.queue.get()
-        else:
+        if self.queue.empty():
             return None
+        else:
+            return self.queue.get()
+
+    def is_queue_empty(self):
+        """
+        判断队列是否为空
+        :return: True | False
+        """
+        if self.queue.empty():
+            return True
+        else:
+            return False

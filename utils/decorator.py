@@ -100,18 +100,22 @@ def to_json(file_path, print_result=True):
     return swapper
 
 
-def deal_exceptions(func):
+def deal_exceptions(print_exceptions=False):
     """
     不关心函数的返回结果
     执行成功则返回
     执行失败则返回None
-    :param func: 需要装饰的函数
+    :param print_exceptions: 是否将错误信息打印到控制台(default=False)
     :return: True | False
     """
-    def swapper(*args, **kwargs):
-        try:
-            ret = func(*args, **kwargs)
-            return ret
-        except:
-            return None
-    return swapper
+    def _swapper(func):
+        def swapper(*args, **kwargs):
+            try:
+                ret = func(*args, **kwargs)
+                return ret
+            except Exception as e:
+                if print_exceptions:
+                    print(repr(e))
+                return None
+        return swapper
+    return _swapper

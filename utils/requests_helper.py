@@ -6,7 +6,11 @@
 Created by Junyi.
 """
 from requests_html import HTMLSession
+from utils.log_helper import get_logger
 from utils.decorator import deal_exceptions
+
+requests_logger = get_logger(logger_name='requests_logger', to_console=False,
+                             to_file=True, filename='requests')
 
 
 def is_useful_response(func):
@@ -15,18 +19,23 @@ def is_useful_response(func):
     :param func: 需要装饰的函数
     :return: response | None
     """
-    def swapper(*args):
-        response = func(*args)
+    def swapper(*args, **kwargs):
+        response = func(*args, **kwargs)
         if response.status_code == 200:
-            content_type = response.headers['Content_Type']
-            response = response if content_type == 'text/html' else None
+            content_type = response.headers['Content-Type']
+            if 'text/html' in content_type:
+                requests_logger.info(f"Request {response.url} successful!")
+            else:
+                requests_logger.warning(f"{response.url} is not a text html page!")
+                response = None
             return response
         else:
+            requests_logger.warning(f"{response.url}'s status_code is not 200!")
             return None
     return swapper
 
 
-@deal_exceptions
+@deal_exceptions(print_exceptions=False)
 @is_useful_response
 def request_url(url):
     """
@@ -39,5 +48,5 @@ def request_url(url):
                       '(KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
     }
     session = HTMLSession()
-    response = session.get(url, headers)
+    response = session.get(url, headers=headers)
     return response

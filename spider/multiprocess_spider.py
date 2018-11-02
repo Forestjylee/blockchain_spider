@@ -6,33 +6,24 @@
 Created by Junyi.
 """
 from multiprocessing import Pool
-from url_queue import get_queue_object
+from utils.log_helper import get_logger
 from utils.parse_helper import ParseHelper
 from utils.requests_helper import request_url
 from pipline.mongo_pipline import MongoPipline
-# TODO logging日志模块初步定于在此添加
+
 
 class MultiProcessSpider(object):
 
-    def __init__(self, queue_type, process_num=6):
+    def __init__(self, queue, process_num=6):
         """
         :param process_num: 同时执行的进程数
-        :param queue_type: 共享队列类型(redis|normal|)
+        :param queue_type: 共享队列类型(redis|...|)
+        :parameter logger: 日志生成对象，默认过滤级别为logging.INFO
         """
         self.process_num = process_num
-        self.queue = get_queue_object(queue_type)
+        self.queue = queue
         self.mongo_tube = MongoPipline()
-        self.__init_spider(queue_type)
-
-    def __init_spider(self, queue_type):
-        """
-        初始化爬虫队列
-        :param queue_type: 共享队列类型(redis|normal|)
-        :return: None
-        """
-        if queue_type == 'normal':
-            crawl_urls = self.mongo_tube.get_crawl_urls()
-            self.queue.put_urls_in_queue(crawl_urls)
+        self.logger = get_logger('blockchain_spider', to_file=True)
 
     def crawl(self):
         """
@@ -43,6 +34,7 @@ class MultiProcessSpider(object):
         3.使用ParseHelper中的解析函数解析网页
         4.将数据存储到MongoDB数据库中
         5.将网页中解析出来的url放入共享队列
+        6.记录日志
         [此方案需可以改进的地方：将request请求url部分与后续处理部分分离，
         采用异步HTTP请求的方式进一步爬取提高效率(1,2)(3,4,5)分离]
         :return: None
@@ -54,6 +46,7 @@ class MultiProcessSpider(object):
             new_urls = first_parsed_data['urls'] if first_parsed_data else None
             MongoPipline.save_html_data_to_mongo(first_parsed_data)
             self.queue.put_urls_in_queue(new_urls)
+            self.logger.info(f"{url} is crawled.")
 
     def start_crawl(self):
         """

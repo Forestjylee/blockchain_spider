@@ -63,7 +63,7 @@ def parse_bing_response(response):
     return starts_urls, next_page_url
 
 
-@deal_exceptions
+@deal_exceptions(print_exceptions=False)
 def _get_baidu_next_page_url(html):
     """
     获取百度搜索下一页结果的url
@@ -76,7 +76,7 @@ def _get_baidu_next_page_url(html):
     return next_page_url
 
 
-@deal_exceptions
+@deal_exceptions(print_exceptions=False)
 def _get_sogou_next_page_url(html):
     """
     获取搜狗搜索下一页结果的url
@@ -89,7 +89,7 @@ def _get_sogou_next_page_url(html):
     return next_page_url
 
 
-@deal_exceptions
+@deal_exceptions(print_exceptions=False)
 def _get_bing_next_page_url(html):
     """
     获取必应搜索下一页结果的url
@@ -145,13 +145,14 @@ def get_target_start_urls(url_template, keyword, parse_func, amount):
     :param amount: 需要的start_urls数量
     :return: ->start_urls(list)
     """
-    start_urls = []
+    urls_amount = 0
     search_url = url_template.format(keyword)
     urls, next_page_url = _get_one_page_start_urls(search_url, parse_func=parse_func)
     if urls:
-        start_urls.extend(urls)
-    while len(start_urls) < amount and next_page_url:
+        urls_amount = len(urls)
+        yield urls
+    while urls_amount < amount and next_page_url:
         urls, next_page_url = _get_one_page_start_urls(next_page_url, parse_func=parse_func)
         if urls:
-            start_urls.extend(urls)
-    return start_urls
+            urls_amount += len(urls)
+            yield urls

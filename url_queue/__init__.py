@@ -15,9 +15,9 @@ def get_queue_object(queue_type):
     :param queue_type:采用队列的类型
     :return: ->queue object
     """
-    if queue_type=='redis':
+    if queue_type == 'redis':
         return RedisQueue()
-    elif queue_type=='normal':
+    elif queue_type == 'normal':
         return NormalQueue()
     else:
         return None

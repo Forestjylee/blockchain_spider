@@ -40,7 +40,7 @@ def get_log_handler(handler_object, file_name=None, level=logging.INFO):
     :param handler_object: handler object
     :return: logger object with new handler.
     """
-    log_handler = handler_object(filename=file_name) if file_name else handler_object()
+    log_handler = handler_object(filename=get_file_name(file_name)) if file_name else handler_object()
     log_handler.setLevel(level)
     log_format = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s',
                                     datefmt='%Y/%m/%d %I:%M:%S %p')
@@ -48,11 +48,12 @@ def get_log_handler(handler_object, file_name=None, level=logging.INFO):
     return log_handler
 
 
-def get_file_name():
+def get_file_name(keyword='spider'):
     """
     根据当前日期自动生成一个文件名
+    :param keyword: 自动生成文件名的关键字
     :return: file_name
     """
     now_date = date.today()
-    file_name = f"{str(now_date)}-spider.log"
+    file_name = f"{str(now_date)}-{keyword}.log"
     return file_name
