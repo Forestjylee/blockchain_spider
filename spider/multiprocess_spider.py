@@ -37,6 +37,14 @@ class MultiProcessSpider(object):
     def crawl(self):
         """
         一个子进程执行的爬取任务
+        流程：
+        1.从共享url队列中取出一个url
+        2.使用request_url函数获取网页response
+        3.使用ParseHelper中的解析函数解析网页
+        4.将数据存储到MongoDB数据库中
+        5.将网页中解析出来的url放入共享队列
+        [此方案需可以改进的地方：将request请求url部分与后续处理部分分离，
+        采用异步HTTP请求的方式进一步爬取提高效率(1,2)(3,4,5)分离]
         :return: None
         """
         while True:
@@ -44,6 +52,7 @@ class MultiProcessSpider(object):
             response = request_url(url)
             first_parsed_data = ParseHelper.first_parse_response(response)
             new_urls = first_parsed_data['urls'] if first_parsed_data else None
+            MongoPipline.save_html_data_to_mongo(first_parsed_data)
             self.queue.put_urls_in_queue(new_urls)
 
     def start_crawl(self):

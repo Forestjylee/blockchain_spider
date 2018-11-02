@@ -32,6 +32,22 @@ def timeit(func):
     return swapper
 
 
+def with_log(logger, message):
+    """
+    日志装饰器
+    :param logger: logger object
+    :param message: 需要输出的信息
+    :return: None
+    """
+    def swapper(func):
+        def _swapper(*args, **kwargs):
+            ret = func(*args, **kwargs)
+            logger.info(message)
+            return ret
+        return _swapper
+    return swapper
+
+
 def to_pickle(file_path, print_result=True):
     """
     将函数返回结果自动序列化并存储的装饰器
@@ -81,4 +97,21 @@ def to_json(file_path, print_result=True):
             NormalPipline.save_as_json(data, file_path, print_result)
             return data
         return _swapper
+    return swapper
+
+
+def deal_exceptions(func):
+    """
+    不关心函数的返回结果
+    执行成功则返回
+    执行失败则返回None
+    :param func: 需要装饰的函数
+    :return: True | False
+    """
+    def swapper(*args, **kwargs):
+        try:
+            ret = func(*args, **kwargs)
+            return ret
+        except:
+            return None
     return swapper

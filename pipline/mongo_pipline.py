@@ -6,6 +6,7 @@
 Created by Junyi.
 """
 import pymongo
+from utils.decorator import deal_exceptions
 
 
 class MongoPipline(object):
@@ -41,17 +42,20 @@ class MongoPipline(object):
         db.drop_collection(collection_name)
         db[collection_name].insert_many([{'url': crawl_url} for crawl_url in crawl_urls])
 
+    @deal_exceptions
     def save_html_data_to_mongo(self, data, db_name='blockchain_data',
-                                collection_name='html_data'):
+                                collection_name='html_data', is_append=False):
         """
         将爬取到的html数据存储到MongoDB中
         :param db_name: mongoDB数据库名称
         :param data: 需要存储的数据
         :param collection_name: collect名称（概念类似SQL的表）
+        :param is_append: 是否以追加的形式的插入数据库
         :return: True || False
         """
-        if self.__client[db_name][collection_name].update(
-                {'source_url': data['source_url']}, {'$set': data}, True):
-            return True
-        else:
-            return False
+        if data:
+            if is_append:
+                self.__client[db_name][collection_name].update({'source_url': data['source_url']},
+                                                               {'$set': data}, True)
+            else:
+                self.__client[db_name][collection_name].insert_one(data)

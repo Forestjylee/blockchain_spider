@@ -6,12 +6,9 @@ parse部分
 Created by Junyi.
 """
 from datetime import datetime
-from pipline.mongo_pipline import MongoPipline
 
 
 class ParseHelper(object):
-
-    mongo_tube = MongoPipline()
 
     @classmethod
     def first_parse_response(cls, response):
@@ -25,31 +22,14 @@ class ParseHelper(object):
                     'datetime': datetime,
         } | None
         """
-        if response and response.status_code == 200 and cls.__is_text_html(response):
-            absolute_links, text = response.html.absolute_links, response.html.text
+        if response:
+            html = response.html
             data = {
                         'source_url': response.url,
-                        'urls': absolute_links,
-                        'text': text,
+                        'urls': html.absolute_links,
+                        'text': html.text,
                         'datetime': str(datetime.now()),
             }
-            cls.mongo_tube.save_html_data_to_mongo(data)
             return data
         else:
             return None
-
-    @staticmethod
-    def __is_text_html(response):
-        """
-        判断网页是否为text/html格式的
-        :param response: 网页的响应
-        :return: True | False
-        """
-        try:
-            content_type = response.headers['Content_Type']
-            if content_type == 'text/html':
-                return True
-            else:
-                return False
-        except:
-            return False
