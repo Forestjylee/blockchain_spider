@@ -6,6 +6,7 @@ start_urls.py的辅助函数
 Created by Junyi.
 """
 from requests_html import HTMLSession
+from .decorator import deal_exceptions
 
 
 def parse_baidu_response(response):
@@ -62,31 +63,42 @@ def parse_bing_response(response):
     return starts_urls, next_page_url
 
 
+@deal_exceptions
 def _get_baidu_next_page_url(html):
     """
     获取百度搜索下一页结果的url
+    装饰器处理异常，异常情况返回None
     :param html: response.html(Type "HTML")
     :return: next_page_url
     """
-    try:
-        refer_link = html.find('a', containing='下一页')[-1].attrs['href']
-        next_page_url = f"https://www.baidu.com{refer_link}"
-    except TypeError:
-        next_page_url = None
+    refer_link = html.find('a', containing='下一页')[-1].attrs['href']
+    next_page_url = f"https://www.baidu.com{refer_link}"
     return next_page_url
 
 
+@deal_exceptions
 def _get_sogou_next_page_url(html):
     """
     获取搜狗搜索下一页结果的url
+    装饰器处理异常，异常情况返回None
     :param html: response.html(Type "HTML")
     :return: next_page_url
     """
-    try:
-        refer_link = html.find('#sogou_next')[0].attrs['href']
-        next_page_url = f"https://www.sogou.com/web{refer_link}"
-    except TypeError:
-        next_page_url = None
+    refer_link = html.find('#sogou_next')[0].attrs['href']
+    next_page_url = f"https://www.sogou.com/web{refer_link}"
+    return next_page_url
+
+
+@deal_exceptions
+def _get_bing_next_page_url(html):
+    """
+    获取必应搜索下一页结果的url
+    装饰器处理异常，异常情况返回None
+    :param html: response.html(Type "HTML")
+    :return: next_page_url
+    """
+    refer_link = html.search('title=\"下一页\" href=\"{}\"')[0].replace('amp;', '')
+    next_page_url = f"https://cn.bing.com{refer_link}"
     return next_page_url
 
 
@@ -100,20 +112,6 @@ def _get_sogou_real_url(search_result_url):
     response = sess.get(search_result_url)
     real_url = response.html.text.split('\"')[1]
     return real_url
-
-
-def _get_bing_next_page_url(html):
-    """
-    获取必应搜索下一页结果的url
-    :param html: response.html(Type "HTML")
-    :return: next_page_url
-    """
-    try:
-        refer_link = html.search('title=\"下一页\" href=\"{}\"')[0].replace('amp;', '')
-        next_page_url = f"https://cn.bing.com{refer_link}"
-    except TypeError:
-        next_page_url = None
-    return next_page_url
 
 
 def _get_one_page_start_urls(search_url, parse_func, retry_times=0):
