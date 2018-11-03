@@ -9,7 +9,11 @@ import redis
 
 
 class RedisQueue(object):
-
+    """
+    redis实现的共享队列类
+    生产环境中使用方案
+    适用性广，性能高，但是依赖redis数据库
+    """
     def __init__(self, host='localhost', queue_name='blockchain_urls'):
         """
         初始化redis队列对象

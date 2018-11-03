@@ -17,7 +17,7 @@ class MultiProcessSpider(object):
     def __init__(self, queue, process_num=6):
         """
         :param process_num: 同时执行的进程数
-        :param queue_type: 共享队列类型(redis|...|)
+        :param queue: 共享队列对象(redis|...|)
         :parameter logger: 日志生成对象，默认过滤级别为logging.INFO
         """
         self.process_num = process_num
