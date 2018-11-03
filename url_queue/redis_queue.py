@@ -40,7 +40,7 @@ class RedisQueue(object):
         取出redis队列第一个元素
         :return: ->item | None(队列为空时)
         """
-        return self.redis_queue.lpop()
+        return self.redis_queue.lpop(self.queue_name)
 
     def put_url_in_queue(self, item):
         """
