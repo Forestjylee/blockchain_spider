@@ -80,6 +80,8 @@ def build_start_urls_pool(keyword, queue_object=None,
                           baidu_num=100, sogou_num=100):
     """
     创建起始地址池
+    多非守护式线程实现
+    采用RLock锁保证线程安全
     :param keyword: 搜索关键词
     :param queue_object: 队列对象(若无则不将结果放入队列)
     :param baidu_num: 从百度搜索中提取的起始地址数

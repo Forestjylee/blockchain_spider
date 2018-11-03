@@ -42,7 +42,7 @@ class MongoPipline(object):
         db.drop_collection(collection_name)
         db[collection_name].insert_many([{'url': crawl_url} for crawl_url in crawl_urls])
 
-    @deal_exceptions
+    @deal_exceptions(print_exceptions=False)
     def save_html_data_to_mongo(self, data, db_name='blockchain_data',
                                 collection_name='html_data', is_append=False):
         """
