@@ -11,7 +11,7 @@ Get 30 start_urls about '区块链' from baidu.
 @time: 2018/10/22 10:53
 Created by Junyi.
 """
-from threading import Thread, RLock
+from threading import Thread, Lock
 from utils.start_urls_helper import (parse_baidu_response,parse_sogou_response,
                                      parse_bing_response,get_target_start_urls)
 
@@ -89,13 +89,13 @@ def build_start_urls_pool(keyword, queue_object=None,
     :return: start_urls
     """
     start_urls = []
-    rlock = RLock()
+    lock = Lock()
     thread1 = Thread(target=__crawl_start_urls,
                     args=(start_urls, 'baidu',
-                          keyword, baidu_num, rlock))
+                          keyword, baidu_num, lock))
     thread2 = Thread(target=__crawl_start_urls,
                      args=(start_urls, 'sogou',
-                           keyword, sogou_num, rlock))
+                           keyword, sogou_num, lock))
     thread1.setDaemon(False)
     thread2.setDaemon(False)
     thread1.start()
@@ -108,17 +108,16 @@ def build_start_urls_pool(keyword, queue_object=None,
     return start_urls
 
 
-def __crawl_start_urls(start_urls, search_engine, keyword, amount, rlock):
+def __crawl_start_urls(start_urls, search_engine, keyword, amount, lock):
     """
     线程执行的任务
     :param start_urls: 起始地址列表
     :param search_engine: 使用的搜索引擎
     :param keyword: 搜索关键字
     :param amount: 需要的预期结果数量
-    :param rlock: 线程锁变量<threading.RLock>
+    :param lock: 线程锁变量<threading.Lock>
     :return: None
     """
     for urls in get_start_urls(search_engine, keyword, amount):
-        rlock.acquire()
-        start_urls.extend(urls)
-        rlock.release()
+        with lock:
+            start_urls.extend(urls)

@@ -32,9 +32,8 @@ class NormalQueue(object):
         :param item: 需要push的元素
         :return: None
         """
-        self.lock.acquire()
-        self.queue.put(item)
-        self.lock.release()
+        with self.lock:
+            self.queue.put(item)
 
     def put_urls_in_queue(self, items):
         """
