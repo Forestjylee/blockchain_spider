@@ -164,7 +164,7 @@ if '__name__' == '__main__':
 
 
 ```python
->>>python run.py
+>>> python run.py
 ```
 
 
