@@ -23,7 +23,7 @@ class MultiProcessSpider(object):
         self.process_num = process_num
         self.queue = queue
         self.mongo_tube = MongoPipline()
-        self.logger = get_logger('blockchain_spider', to_file=True)
+        self.logger = get_logger('blockchain_spider', to_file=True, filename='spider')
 
     def crawl(self):
         """
@@ -45,8 +45,9 @@ class MultiProcessSpider(object):
             first_parsed_data = ParseHelper.first_parse_response(response)
             new_urls = first_parsed_data['urls'] if first_parsed_data else None
             MongoPipline.save_html_data_to_mongo(first_parsed_data)
-            self.queue.put_urls_in_queue(new_urls)
+            url_amount = self.queue.put_urls_in_queue(new_urls)
             self.logger.info(f"{url} is crawled.")
+            self.logger.info(f"There are {url_amount} urls in queue now.")
 
     def start_crawl(self):
         """

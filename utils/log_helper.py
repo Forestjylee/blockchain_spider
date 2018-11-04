@@ -48,7 +48,7 @@ def get_log_handler(handler_object, file_name=None, level=logging.INFO):
     return log_handler
 
 
-def get_file_name(keyword='spider'):
+def get_file_name(keyword):
     """
     根据当前日期自动生成一个文件名
     :param keyword: 自动生成文件名的关键字
