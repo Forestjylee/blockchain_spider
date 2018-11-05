@@ -11,7 +11,6 @@ from url_queue import get_queue_object
 from utils.log_helper import get_logger
 from utils.parse_helper import ParseHelper
 from utils.requests_helper import request_url
-from .start_urls_spider import get_more_start_urls
 
 
 class MultiProcessSpider(object):
@@ -46,7 +45,7 @@ class MultiProcessSpider(object):
         logger = get_logger('blockchain_spider', to_file=True, filename='spider')
         while True:
             url = queue.get_url_from_queue()
-            response = request_url(url) if url else get_more_start_urls()
+            response = request_url(url)
             first_parsed_data = ParseHelper.first_parse_response(response)
             new_urls = first_parsed_data['urls'] if first_parsed_data else None
             pipline.save_html_data(first_parsed_data)

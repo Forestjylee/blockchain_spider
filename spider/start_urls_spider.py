@@ -78,11 +78,6 @@ def get_start_urls(search_engine, keyword, amount=10):
         raise AttributeError
 
 
-def get_more_start_urls():
-    #TODO 获取更多的start_urls，添加到共享相对列并返回1个url
-    raise EOFError("没有url了。")
-
-
 @to_pickle('start_urls.pck', print_result=True)
 def build_start_urls_pool(keyword, queue_object=None,
                           baidu_num=100, sogou_num=100):
