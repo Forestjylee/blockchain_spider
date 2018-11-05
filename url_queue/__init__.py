@@ -20,4 +20,4 @@ def get_queue_object(queue_type):
     elif queue_type == 'normal':
         return NormalQueue()
     else:
-        return None
+        raise TypeError(f"{queue_type} is not support!")

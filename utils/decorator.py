@@ -6,7 +6,8 @@
 Created by Junyi.
 """
 import time
-from pipline.normal_pipline import NormalPipline
+from requests import get
+from .io_helper import save_as_json, save_as_pickle
 
 
 def timeit(func):
@@ -68,7 +69,7 @@ def to_pickle(file_path, print_result=True):
     def swapper(func):
         def _swapper(*args, **kwargs):
             data = func(*args, **kwargs)
-            NormalPipline.save_as_pickle(data, file_path, print_result)
+            save_as_pickle(data, file_path, print_result)
             return data
         return _swapper
     return swapper
@@ -94,7 +95,7 @@ def to_json(file_path, print_result=True):
     def swapper(func):
         def _swapper(*args, **kwargs):
             data = func(*args, **kwargs)
-            NormalPipline.save_as_json(data, file_path, print_result)
+            save_as_json(data, file_path, print_result)
             return data
         return _swapper
     return swapper
@@ -111,11 +112,25 @@ def deal_exceptions(print_exceptions=False):
     def _swapper(func):
         def swapper(*args, **kwargs):
             try:
-                ret = func(*args, **kwargs)
-                return ret
+                return func(*args, **kwargs)
             except Exception as e:
                 if print_exceptions:
                     print(repr(e))
                 return None
         return swapper
     return _swapper
+
+
+def ensure_network_env(func):
+    """
+    在运行函数之前，判断网络环境是否正常
+    异常则抛出ConnectionError错误
+    :return: ->func's return | Exceptions
+    """
+    def swapper(*args, **kwargs):
+        try:
+            get('http://www.baidu.com')
+            return func(*args, **kwargs)
+        except:
+            raise ConnectionError("当前网络环境异常!")
+    return swapper

@@ -7,6 +7,7 @@ Created by Junyi.
 """
 import pickle
 import json
+# TODO [需要重写]API封装要与Mongo_pipline统一
 
 
 class NormalPipline(object):
@@ -15,16 +16,18 @@ class NormalPipline(object):
     """
     @staticmethod
     def save_as_pickle(data, file_path, print_result=True):
-        with open(file_path, 'wb') as fw:
-            pickle.dump(data, fw)
-        if print_result:
-            print("Save as pickle success!")
+        if data:
+            with open(file_path, 'wb') as fw:
+                pickle.dump(data, fw)
+            if print_result:
+                print(f"Save to {file_path} as pickle success!")
+        else:
+            print(f"{data.__name__} which going to save is None.")
 
     @staticmethod
     def read_pickle_file(file_path):
         with open(file_path, 'rb') as fr:
-            data = pickle.load(fr)
-        return data
+            return pickle.load(fr)
 
     @staticmethod
     def append_as_pickle(data, file_path, print_result=True):
@@ -32,15 +35,20 @@ class NormalPipline(object):
         if isinstance(old_data, (list, dict)):
             data = old_data.append(data)
             NormalPipline.save_as_pickle(data, file_path, print_result)
+            if print_result:
+                print(f"Append to {file_path} as pickle success!")
         else:
             raise TypeError("原本的数据必须是列表或字典才可以追加")
 
     @staticmethod
     def save_as_json(data, file_path, print_result=True):
-        with open(file_path, 'w') as fw:
-            json.dump(data, fw, ensure_ascii=False)
-        if print_result:
-            print("Save as json success!")
+        if data:
+            with open(file_path, 'w') as fw:
+                json.dump(data, fw, ensure_ascii=False)
+            if print_result:
+                print(f"Save to {file_path} as json success!")
+        else:
+            print(f"{data.__name__} which going to save is None.")
 
     @staticmethod
     def read_json_file(file_path):
@@ -53,5 +61,7 @@ class NormalPipline(object):
         if isinstance(old_data, (list, dict)):
             data = old_data.append(data)
             NormalPipline.save_as_json(data, file_path, print_result)
+            if print_result:
+                print(f"Save to {file_path} as json success!")
         else:
             raise TypeError("原本的数据必须是列表或字典才可以追加")

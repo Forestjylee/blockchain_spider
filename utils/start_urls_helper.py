@@ -156,3 +156,19 @@ def get_target_start_urls(url_template, keyword, parse_func, amount):
         if urls:
             urls_amount += len(urls)
             yield urls
+
+
+def __put_in_pool(start_urls, queue_object):
+    """
+    将获取到的起始地址放入共享队列中
+    若无则报错
+    :param start_urls: 起始地址列表
+    :param queue_object: 共享队列操作对象
+    :return: ->start_urls | None
+    """
+    if start_urls:
+        if queue_object:
+            queue_object.put_urls_in_queue(start_urls)
+        return start_urls
+    else:
+        raise EOFError("无法获取到起始地址！")

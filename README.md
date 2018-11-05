@@ -28,6 +28,7 @@
 │
 └─utils
     │  decorator.py
+    │  io_helper.py
     │  log_helper.py
     │  parse_helper.py
     │  requests_helper.py
@@ -59,7 +60,7 @@
 ##### 在blockchain_spider目录下打开cmd，输入：
 
 ```python
->>>pipenv graph
+>>> pipenv graph
 >>>
 pymongo==3.7.2
 redis==2.10.6
@@ -91,7 +92,7 @@ requests-html==0.9.0
 ##### 若提示找不到pipenv命令，请检查环境变量是否配置正确然后安装pipenv，命令：
 
 ```python
->>>pip install pipenv
+>>> pip install pipenv
 ```
 
 ##### （需要注意的是，blockchain_spider的运行环境是python3.7，请确保本地存在python3.7解释器）
@@ -101,8 +102,8 @@ requests-html==0.9.0
 ##### 创建blockchain_spider运行的虚拟环境：
 
 ```python
->>>cd blockchain_spider
->>>pipenv install
+>>> cd blockchain_spider
+>>> pipenv install
 ```
 
 
@@ -118,8 +119,8 @@ requests-html==0.9.0
 ##### 打开cmd，输入：
 
 ```python
->>>cd mongo/3.4/bin
->>>mongod --dbpath [此处输入希望数据保存的文件夹绝对路径]
+>>> cd mongo/3.4/bin
+>>> mongod --dbpath [此处输入希望数据保存的文件夹绝对路径]
 ```
 
 ##### 无异常则说明MongoDB数据库正常运行
@@ -129,8 +130,8 @@ requests-html==0.9.0
 ##### Windows环境下开启Redis数据库，打开cmd：
 
 ```python
->>>cd redis(进入redis安装目录)
->>>start redis-server.exe
+>>> cd redis(进入redis安装目录)
+>>> start redis-server.exe
 ```
 
 ##### 回车之后会弹出一个新的cmd窗口，没有异常则表示redis成功运行
@@ -142,19 +143,19 @@ requests-html==0.9.0
 ##### （高性能版本）在blockchain_spider文件夹中打开cmd,输入：
 
 ```python
->>>pipenv run run_spider.py
+>>> pipenv run run_spider.py
 ```
 
 ##### （展示版本）在blockchain_spider文件夹中打开cmd，输入：
 
 ```python
->>>pipenv run run_test_spider.py
+>>> pipenv run run_test_spider.py
 ```
 
 ##### 或者可以在其他地方通过导入blockchain_spider包来运行,新建一个run.py文件：
 
 ```python
-@file: run.py
+# @file: run.py
 from blockchain_spider import run_spider
 
 
@@ -164,7 +165,7 @@ if '__name__' == '__main__':
 
 
 ```python
->>>python run.py
+>>> python run.py
 ```
 
 

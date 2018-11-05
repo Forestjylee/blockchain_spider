@@ -7,25 +7,41 @@ spider包
 Created by Junyi.
 """
 from url_queue import get_queue_object
+from pipline import get_pipline_object
+from utils.decorator import ensure_network_env
 from .multiprocess_spider import MultiProcessSpider
 from .start_urls_spider import get_start_urls, build_start_urls_pool
 
 
-def run_spider(keyword, queue_type='redis'):
+@ensure_network_env
+def run_spider(keyword, queue_type='redis', pipline_type='mongo', process_num=7):
     """
     爬虫的入口函数
     默认使用redis作为url共享队列
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~执行流程：                       ~
+    ~1.测试网络是否通畅（装饰器实现）   ~
+    ~2.获取队列对象和数据库对象        ~
+    ~3.判断队列是否为空，构建起始地址池 ~
+    ~4.启动爬虫                       ~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     :param keyword: 爬取的关键字
-    :param queue_type: url共享队列类型
+    :param queue_type: url共享队列类型（默认redis）
+    :param pipline_type: 使用的存储数据库管道类型（默认MongoDB）
+    :param process_num: 并行进程数（默认为7）
     :return: None
     """
     queue = get_queue_object(queue_type)
+    pipline = get_pipline_object(pipline_type)
+    print("数据库连接成功！\n正在获取起始地址池...")
     if queue.is_queue_empty():
         build_start_urls_pool(keyword, queue)
-    spider = MultiProcessSpider(queue)
+    print("起始地址池构建成功，开始爬取...")
+    spider = MultiProcessSpider(queue, pipline, process_num)
     spider.start_crawl()
 
 
+@ensure_network_env
 def run_test_spider(keyword):
     #TODO 用于展示和测试网络环境的爬虫
     pass

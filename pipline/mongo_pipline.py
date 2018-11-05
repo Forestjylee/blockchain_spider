@@ -28,7 +28,7 @@ class MongoPipline(object):
             crawl_urls.append(item['url'])
         return crawl_urls
 
-    def save_crawl_urls_to_mongo(self, crawl_urls, db_name='blockchain_data',
+    def save_crawl_urls(self, crawl_urls, db_name='blockchain_data',
                                  collection_name='crawl_urls'):
         """
         先删除原来的数据
@@ -43,8 +43,8 @@ class MongoPipline(object):
         db[collection_name].insert_many([{'url': crawl_url} for crawl_url in crawl_urls])
 
     @deal_exceptions(print_exceptions=False)
-    def save_html_data_to_mongo(self, data, db_name='blockchain_data',
-                                collection_name='html_data', is_append=False):
+    def save_html_data(self, data, db_name='blockchain_data',
+                       collection_name='html_data', is_append=False):
         """
         将爬取到的html数据存储到MongoDB中
         :param db_name: mongoDB数据库名称

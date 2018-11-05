@@ -12,8 +12,10 @@ Get 30 start_urls about '区块链' from baidu.
 Created by Junyi.
 """
 from threading import Thread, Lock
-from utils.start_urls_helper import (parse_baidu_response,parse_sogou_response,
-                                     parse_bing_response,get_target_start_urls)
+from utils.decorator import to_pickle
+from utils.start_urls_helper import (parse_baidu_response, parse_sogou_response,
+                                     parse_bing_response, get_target_start_urls,
+                                     __put_in_pool)
 
 BAIDU_URL_TEMPLATE = "https://www.baidu.com/s?ie=UTF-8&wd={}"
 
@@ -76,23 +78,30 @@ def get_start_urls(search_engine, keyword, amount=10):
         raise AttributeError
 
 
+def get_more_start_urls():
+    #TODO 获取更多的start_urls，添加到共享相对列并返回1个url
+    raise EOFError("没有url了。")
+
+
+@to_pickle('start_urls.pck', print_result=True)
 def build_start_urls_pool(keyword, queue_object=None,
                           baidu_num=100, sogou_num=100):
     """
     创建起始地址池
     多非守护式线程实现
-    采用RLock锁保证线程安全
+    采用锁保证线程安全
+    将结果序列化保存到运行目录下，以便后续恢复
     :param keyword: 搜索关键词
     :param queue_object: 队列对象(若无则不将结果放入队列)
-    :param baidu_num: 从百度搜索中提取的起始地址数
-    :param sogou_num: 从搜狗搜索中提取的起始地址数
-    :return: start_urls
+    :param baidu_num: 从百度搜索中提取的起始地址数（默认100个）
+    :param sogou_num: 从搜狗搜索中提取的起始地址数（默认100个）
+    :return: ->start_urls<list>
     """
     start_urls = []
     lock = Lock()
     thread1 = Thread(target=__crawl_start_urls,
-                    args=(start_urls, 'baidu',
-                          keyword, baidu_num, lock))
+                     args=(start_urls, 'baidu',
+                           keyword, baidu_num, lock))
     thread2 = Thread(target=__crawl_start_urls,
                      args=(start_urls, 'sogou',
                            keyword, sogou_num, lock))
@@ -103,9 +112,7 @@ def build_start_urls_pool(keyword, queue_object=None,
     thread1.join()
     thread2.join()
     start_urls = list(set(start_urls))
-    if queue_object:
-        queue_object.put_urls_in_queue(start_urls)
-    return start_urls
+    return __put_in_pool(start_urls, queue_object)
 
 
 def __crawl_start_urls(start_urls, search_engine, keyword, amount, lock):
@@ -121,3 +128,4 @@ def __crawl_start_urls(start_urls, search_engine, keyword, amount, lock):
     for urls in get_start_urls(search_engine, keyword, amount):
         with lock:
             start_urls.extend(urls)
+        print(urls)
