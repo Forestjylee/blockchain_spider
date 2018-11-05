@@ -52,7 +52,8 @@ class MultiProcessSpider(object):
             pipline.save_html_data(first_parsed_data)
             url_amount = queue.put_urls_in_queue(new_urls)
             logger.info(f"{url} has been crawled.")
-            logger.info(f"There are {url_amount} urls in queue now.")
+            if url_amount:
+                logger.info(f"There are {url_amount} urls in queue now.")
 
     def start_crawl(self):
         """

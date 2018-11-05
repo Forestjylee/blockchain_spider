@@ -40,6 +40,7 @@ def is_useful_response(func):
 def request_url(url):
     """
     发起get请求得到网页响应
+    设置超时时间为3秒(提高爬取效率)
     :param url: 目标网页url
     :return: ->response(Request.response)
     """
@@ -48,5 +49,5 @@ def request_url(url):
                       '(KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
     }
     session = HTMLSession()
-    response = session.get(url, headers=headers)
+    response = session.get(url, headers=headers, timeout=3)
     return response
