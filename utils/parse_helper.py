@@ -26,7 +26,7 @@ class ParseHelper(object):
             html = response.html
             data = {
                         'source_url': response.url,
-                        'urls': html.absolute_links,
+                        'urls': list(html.absolute_links),
                         'text': html.text,
                         'datetime': str(datetime.now()),
             }

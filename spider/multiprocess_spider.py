@@ -6,6 +6,8 @@
 Created by Junyi.
 """
 from multiprocessing import Pool
+from pipline import get_pipline_object
+from url_queue import get_queue_object
 from utils.log_helper import get_logger
 from utils.parse_helper import ParseHelper
 from utils.requests_helper import request_url
@@ -14,17 +16,15 @@ from .start_urls_spider import get_more_start_urls
 
 class MultiProcessSpider(object):
 
-    def __init__(self, queue, pipline, process_num):
+    def __init__(self, queue_type, pipline_type, process_num):
         """
         :param process_num: 同时执行的进程数
-        :param queue: 共享队列对象(redis|...|)
-        :param pipline: 输送到数据库的管道对象
-        :parameter logger: 日志生成对象，默认过滤级别为logging.INFO
+        :param queue_type: 共享队列类型(redis|...|)
+        :param pipline_type: 输送到数据库的管道类型
         """
         self.process_num = process_num
-        self.queue = queue
-        self.pipline = pipline
-        self.logger = get_logger('blockchain_spider', to_file=True, filename='spider')
+        self.queue_type = queue_type
+        self.pipline_type = pipline_type
 
     def crawl(self):
         """
@@ -38,26 +38,29 @@ class MultiProcessSpider(object):
         6.记录日志
         [此方案需可以改进的地方：将request请求url部分与后续处理部分分离，
         采用异步HTTP请求的方式进一步爬取提高效率(1,2)(3,4,5)分离]
+        :parameter logger: 日志生成对象，默认过滤级别为logging.INFO
         :return: None
         """
+        queue = get_queue_object(self.queue_type)
+        pipline = get_pipline_object(self.pipline_type)
+        logger = get_logger('blockchain_spider', to_file=True, filename='spider')
         while True:
-            url = self.queue.get_url_from_queue()
+            url = queue.get_url_from_queue()
             response = request_url(url) if url else get_more_start_urls()
             first_parsed_data = ParseHelper.first_parse_response(response)
             new_urls = first_parsed_data['urls'] if first_parsed_data else None
-            self.pipline.save_html_data(first_parsed_data)
-            url_amount = self.queue.put_urls_in_queue(new_urls)
-            self.logger.info(f"{url} is crawled.")
-            self.logger.info(f"There are {url_amount} urls in queue now.")
+            pipline.save_html_data(first_parsed_data)
+            url_amount = queue.put_urls_in_queue(new_urls)
+            logger.info(f"{url} is crawled.")
+            logger.info(f"There are {url_amount} urls in queue now.")
 
     def start_crawl(self):
         """
         多进程调度函数(进程池实现)
         :return: None
         """
-        self.logger.info(f"Start with {self.queue.get_queue_len()} urls in queue.")
         pool = Pool(processes=self.process_num)
         for _ in range(self.process_num):
-            pool.apply_async(self.crawl, args=(self.queue, ))
+            pool.apply_async(self.crawl)
         pool.close()
         pool.join()

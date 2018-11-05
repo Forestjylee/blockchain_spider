@@ -32,16 +32,15 @@ def run_spider(keyword, queue_type='redis', pipline_type='mongo', process_num=7)
     :return: None
     """
     queue = get_queue_object(queue_type)
-    pipline = get_pipline_object(pipline_type)
     print("数据库连接成功！\n正在获取起始地址池...")
     if queue.is_queue_empty():
         build_start_urls_pool(keyword, queue)
     print("起始地址池构建成功，开始爬取...")
-    spider = MultiProcessSpider(queue, pipline, process_num)
+    spider = MultiProcessSpider(queue_type, pipline_type, process_num)
     spider.start_crawl()
 
 
 @ensure_network_env
 def run_test_spider(keyword):
-    #TODO 用于展示和测试网络环境的爬虫
+    #TODO 用于展示和测试的爬虫
     pass
