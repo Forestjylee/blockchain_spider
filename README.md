@@ -159,7 +159,7 @@ requests-html==0.9.0
 from blockchain_spider import run_spider
 
 
-if '__name__' == '__main__':
+if __name__ == '__main__':
     run_spider('区块链')
 ```
 
