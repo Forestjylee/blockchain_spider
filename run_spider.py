@@ -9,4 +9,8 @@ from spider import run_spider
 
 
 if __name__ == '__main__':
-    run_spider('区块链')
+    try:
+        run_spider('区块链', process_num=7, timeout=4)     # 急速模式
+        # run_spider('区块链', process_num=4, timeout=4)     # 中速模式
+    except Exception as e:
+        print(f"Error is {repr(e)}")

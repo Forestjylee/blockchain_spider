@@ -7,14 +7,13 @@ spider包
 Created by Junyi.
 """
 from url_queue import get_queue_object
-from pipline import get_pipline_object
 from utils.decorator import ensure_network_env
 from .multiprocess_spider import MultiProcessSpider
 from .start_urls_spider import get_start_urls, build_start_urls_pool
 
 
 @ensure_network_env
-def run_spider(keyword, queue_type='redis', pipline_type='mongo', process_num=7):
+def run_spider(keyword, queue_type='redis', pipline_type='mongo', process_num=7, timeout=None):
     """
     爬虫的入口函数
     默认使用redis作为url共享队列
@@ -29,6 +28,7 @@ def run_spider(keyword, queue_type='redis', pipline_type='mongo', process_num=7)
     :param queue_type: url共享队列类型（默认redis）
     :param pipline_type: 使用的存储数据库管道类型（默认MongoDB）
     :param process_num: 并行进程数（默认为7）
+    :param timeout: 单次请求超时时间(默认为None，永久等待)
     :return: None
     """
     queue = get_queue_object(queue_type)
@@ -36,11 +36,6 @@ def run_spider(keyword, queue_type='redis', pipline_type='mongo', process_num=7)
     if queue.is_queue_empty():
         build_start_urls_pool(keyword, queue)
     print("起始地址池构建成功，开始爬取...")
-    spider = MultiProcessSpider(queue_type, pipline_type, process_num)
+    spider = MultiProcessSpider(keyword, queue_type, pipline_type,
+                                process_num, timeout)
     spider.start_crawl()
-
-
-@ensure_network_env
-def run_test_spider(keyword):
-    #TODO 用于展示和测试的爬虫
-    pass

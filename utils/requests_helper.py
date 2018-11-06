@@ -37,11 +37,12 @@ def is_useful_response(func):
 
 @deal_exceptions(print_exceptions=False)
 @is_useful_response
-def request_url(url):
+def request_url(url, timeout):
     """
     发起get请求得到网页响应
     设置超时时间为3秒(提高爬取效率)
     :param url: 目标网页url
+    :param timeout: 单次请求超时时间
     :return: ->response(Request.response)
     """
     headers = {
@@ -49,5 +50,5 @@ def request_url(url):
                       '(KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
     }
     session = HTMLSession()
-    response = session.get(url, headers=headers, timeout=3)
+    response = session.get(url, headers=headers, timeout=timeout)
     return response

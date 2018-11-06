@@ -15,15 +15,20 @@ from utils.requests_helper import request_url
 
 class MultiProcessSpider(object):
 
-    def __init__(self, queue_type, pipline_type, process_num):
+    def __init__(self, keyword, queue_type, pipline_type,
+                 process_num, timeout=None):
         """
+        :param keyword: 爬取的关键字
         :param process_num: 同时执行的进程数
         :param queue_type: 共享队列类型(redis|...|)
         :param pipline_type: 输送到数据库的管道类型
+        :param timeout: 单次request超时时间(默认为None，永久等待)
         """
+        self.keyword = keyword
         self.process_num = process_num
         self.queue_type = queue_type
         self.pipline_type = pipline_type
+        self.timeout = timeout
 
     def crawl(self):
         """
@@ -45,8 +50,8 @@ class MultiProcessSpider(object):
         logger = get_logger('blockchain_spider', to_file=True, filename='spider')
         while True:
             url = queue.get_url_from_queue()
-            response = request_url(url)
-            first_parsed_data = ParseHelper.first_parse_response(response)
+            response = request_url(url, timeout=self.timeout)
+            first_parsed_data = ParseHelper.first_parse_response(response, keyword=self.keyword)
             new_urls = first_parsed_data['urls'] if first_parsed_data else None
             pipline.save_html_data(first_parsed_data)
             url_amount = queue.put_urls_in_queue(new_urls)

@@ -80,7 +80,7 @@ def get_start_urls(search_engine, keyword, amount=10):
 
 @to_pickle('start_urls.pck', print_result=True)
 def build_start_urls_pool(keyword, queue_object=None,
-                          baidu_num=100, sogou_num=100):
+                          baidu_num=50, sogou_num=50):
     """
     创建起始地址池
     多非守护式线程实现
