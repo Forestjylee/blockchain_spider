@@ -13,15 +13,11 @@ Created by Junyi.
 """
 from threading import Thread, Lock
 from utils.decorator import to_pickle
+from .settings import (BAIDU_URL_TEMPLATE, SOGOU_URL_TEMPLATE,
+                       BING_URL_TEMPLATE)
 from utils.start_urls_helper import (parse_baidu_response, parse_sogou_response,
                                      parse_bing_response, get_target_start_urls,
                                      __put_in_pool)
-
-BAIDU_URL_TEMPLATE = "https://www.baidu.com/s?ie=UTF-8&wd={}"
-
-SOGOU_URL_TEMPLATE = "https://www.sogou.com/web?query={}"
-
-BING_URL_TEMPLATE = "https://cn.bing.com/search?q={}"
 
 
 def get_baidu_start_urls(keyword, amount):
