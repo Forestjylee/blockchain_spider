@@ -131,6 +131,7 @@ def ensure_network_env(func):
         try:
             get('http://www.baidu.com')
         except:
-            raise ConnectionError("当前网络环境异常!")
-        return func(*args,**kwargs)
+            print("当前网络环境异常!")
+            exit(-1)
+        return func(*args, **kwargs)
     return swapper

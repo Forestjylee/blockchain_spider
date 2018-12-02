@@ -14,7 +14,7 @@ class RedisQueue(object):
     生产环境中使用方案
     适用性广，性能高，但是依赖redis数据库
     """
-    def __init__(self, host='localhost', queue_name='blockchain_urls'):
+    def __init__(self, host, queue_name):
         """
         初始化redis队列对象
         :param host: redis的ip
@@ -64,6 +64,9 @@ class RedisQueue(object):
             for item in items[:-1]:
                 self.redis_queue.rpush(self.queue_name, item)
             return self.redis_queue.rpush(self.queue_name, items[-1])
+
+    def delete_queue(self):
+        self.redis_queue.delete(self.queue_name)
 
     def is_queue_empty(self):
         """

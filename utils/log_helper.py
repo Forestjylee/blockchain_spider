@@ -9,8 +9,13 @@ import logging
 from datetime import date
 
 
-def get_logger(logger_name='MyLogger', level=logging.INFO,
-               to_console=True, to_file=False, filename=None):
+def get_logger(
+    logger_name="MyLogger",
+    level=logging.INFO,
+    to_console=True,
+    to_file=False,
+    filename=None,
+):
     """
     获取一个logger
     :param logger_name: logger的名称
@@ -23,10 +28,15 @@ def get_logger(logger_name='MyLogger', level=logging.INFO,
     logger = logging.getLogger(logger_name)
     logger.setLevel(level)
     if to_console:
-        logger.addHandler(get_log_handler(handler_object=logging.StreamHandler, level=level))
+        logger.addHandler(
+            get_log_handler(handler_object=logging.StreamHandler, level=level)
+        )
     if to_file:
-        logger.addHandler(get_log_handler(handler_object=logging.FileHandler, level=level,
-                                          file_name=filename))
+        logger.addHandler(
+            get_log_handler(
+                handler_object=logging.FileHandler, level=level, file_name=filename
+            )
+        )
     return logger
 
 
@@ -40,10 +50,15 @@ def get_log_handler(handler_object, file_name=None, level=logging.INFO):
     :param handler_object: handler object
     :return: logger object with new handler.
     """
-    log_handler = handler_object(filename=get_file_name(file_name)) if file_name else handler_object()
+    log_handler = (
+        handler_object(filename=get_file_name(file_name))
+        if file_name
+        else handler_object()
+    )
     log_handler.setLevel(level)
-    log_format = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s',
-                                    datefmt='%Y/%m/%d %I:%M:%S %p')
+    log_format = logging.Formatter(
+        "[%(asctime)s] %(levelname)s: %(message)s", datefmt="%Y/%m/%d %I:%M:%S %p"
+    )
     log_handler.setFormatter(log_format)
     return log_handler
 

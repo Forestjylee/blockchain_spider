@@ -5,10 +5,10 @@ package blockchain_spider
 @time: 2018/11/4 21:52
 Created by Junyi.
 """
-from .spider import run_spider
+from .spider import spider_run
 
 
-__all__ = [run_spider]
+__all__ = [spider_run]
 
 __author__ = 'Junyi'
 

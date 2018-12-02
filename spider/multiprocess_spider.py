@@ -11,24 +11,33 @@ from url_queue import get_queue_object
 from utils.log_helper import get_logger
 from utils.parse_helper import ParseHelper
 from utils.requests_helper import request_url
+from settings import (
+    KEYWORD,
+    URL_QUEUE_TYPE,
+    PIPLINE_TYPE,
+    PROCESS_NUMBER,
+    TIMEOUT,
+    SPIDER_LOG_NAME,
+)
 
 
 class MultiProcessSpider(object):
 
-    def __init__(self, keyword, queue_type, pipline_type,
-                 process_num, timeout=None):
+    def __init__(self):
         """
         :param keyword: 爬取的关键字
         :param process_num: 同时执行的进程数
-        :param queue_type: 共享队列类型(redis|...|)
+        :param url_queue_type: 共享队列类型(redis|...|)
         :param pipline_type: 输送到数据库的管道类型
-        :param timeout: 单次request超时时间(默认为None，永久等待)
+        :param timeout: 单次HTTP request超时时间(默认为None，永久等待)
+        :param spider_log_name: 爬虫日志的文件名
         """
-        self.keyword = keyword
-        self.process_num = process_num
-        self.queue_type = queue_type
-        self.pipline_type = pipline_type
-        self.timeout = timeout
+        self.keyword = KEYWORD
+        self.url_queue_type = URL_QUEUE_TYPE
+        self.pipline_type = PIPLINE_TYPE
+        self.process_num = PROCESS_NUMBER
+        self.timeout = TIMEOUT
+        self.spider_log_name = SPIDER_LOG_NAME
 
     def crawl(self):
         """
@@ -45,14 +54,18 @@ class MultiProcessSpider(object):
         :parameter logger: 日志生成对象，默认过滤级别为logging.INFO
         :return: None
         """
-        queue = get_queue_object(self.queue_type)
+        queue = get_queue_object(self.url_queue_type)
         pipline = get_pipline_object(self.pipline_type)
-        logger = get_logger('blockchain_spider', to_file=True, filename='spider')
+        logger = get_logger(
+            "blockchain_spider", to_file=True, filename=self.spider_log_name
+        )
         while True:
             url = queue.get_url_from_queue()
             response = request_url(url, timeout=self.timeout)
-            first_parsed_data = ParseHelper.first_parse_response(response, keyword=self.keyword)
-            new_urls = first_parsed_data['urls'] if first_parsed_data else None
+            first_parsed_data = ParseHelper.first_parse_response(
+                response, keyword=self.keyword
+            )
+            new_urls = first_parsed_data["urls"] if first_parsed_data else None
             pipline.save_html_data(first_parsed_data)
             url_amount = queue.put_urls_in_queue(new_urls)
             logger.info(f"{url} has been crawled.")

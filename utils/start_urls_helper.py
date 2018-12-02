@@ -158,7 +158,7 @@ def get_target_start_urls(url_template, keyword, parse_func, amount):
             yield urls
 
 
-def __put_in_pool(start_urls, queue_object):
+def put_in_pool(start_urls, queue_object):
     """
     将获取到的起始地址放入共享队列中
     若无则报错

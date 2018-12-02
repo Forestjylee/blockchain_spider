@@ -5,6 +5,7 @@
 @time: 2018/10/31 20:27
 Created by Junyi.
 """
+from settings import REDIS_HOST, URL_QUEUE_NAME
 from .redis_queue import RedisQueue
 from .normal_queue import NormalQueue
 
@@ -16,8 +17,9 @@ def get_queue_object(queue_type):
     :return: ->queue object
     """
     if queue_type == 'redis':
-        return RedisQueue()
+        return RedisQueue(REDIS_HOST, URL_QUEUE_NAME)
     elif queue_type == 'normal':
         return NormalQueue()
     else:
-        raise TypeError(f"{queue_type} is not support!")
+        print(f"{queue_type} is not support!")
+        exit(-1)

@@ -13,11 +13,12 @@ Created by Junyi.
 """
 from threading import Thread, Lock
 from utils.decorator import to_pickle
-from .settings import (BAIDU_URL_TEMPLATE, SOGOU_URL_TEMPLATE,
-                       BING_URL_TEMPLATE)
+from settings import (BAIDU_URL_TEMPLATE, SOGOU_URL_TEMPLATE,
+                      BING_URL_TEMPLATE, START_URLS_SAVE_PATH,
+                      BAIDU_START_URLS_AMOUNT, SOGOU_START_URLS_AMOUNT)
 from utils.start_urls_helper import (parse_baidu_response, parse_sogou_response,
                                      parse_bing_response, get_target_start_urls,
-                                     __put_in_pool)
+                                     put_in_pool)
 
 
 def get_baidu_start_urls(keyword, amount):
@@ -56,12 +57,12 @@ def get_bing_start_urls(keyword, amount):
     return start_urls
 
 
-def get_start_urls(search_engine, keyword, amount=10):
+def get_start_urls(search_engine, keyword, amount):
     """
     顶层封装，供外部调用
     :param search_engine: 使用搜索引擎的类型(baidu, sogou, bing)
     :param keyword: 搜索关键字
-    :param amount: 需要起始url的数量(默认为10)
+    :param amount: 需要起始url的数量
     :return: ->start_urls(list)
     """
     if search_engine == 'baidu':
@@ -74,9 +75,8 @@ def get_start_urls(search_engine, keyword, amount=10):
         raise AttributeError
 
 
-@to_pickle('start_urls.pck', print_result=True)
-def build_start_urls_pool(keyword, queue_object=None,
-                          baidu_num=50, sogou_num=50):
+@to_pickle(START_URLS_SAVE_PATH, print_result=True)
+def build_start_urls_pool(keyword, queue_object=None):
     """
     创建起始地址池
     多非守护式线程实现
@@ -92,10 +92,10 @@ def build_start_urls_pool(keyword, queue_object=None,
     lock = Lock()
     thread1 = Thread(target=__crawl_start_urls,
                      args=(start_urls, 'baidu',
-                           keyword, baidu_num, lock))
+                           keyword, BAIDU_START_URLS_AMOUNT, lock))
     thread2 = Thread(target=__crawl_start_urls,
                      args=(start_urls, 'sogou',
-                           keyword, sogou_num, lock))
+                           keyword, SOGOU_START_URLS_AMOUNT, lock))
     thread1.setDaemon(False)
     thread2.setDaemon(False)
     thread1.start()
@@ -103,7 +103,7 @@ def build_start_urls_pool(keyword, queue_object=None,
     thread1.join()
     thread2.join()
     start_urls = list(set(start_urls))
-    return __put_in_pool(start_urls, queue_object)
+    return put_in_pool(start_urls, queue_object)
 
 
 def __crawl_start_urls(start_urls, search_engine, keyword, amount, lock):

@@ -11,7 +11,7 @@ from datetime import datetime
 class ParseHelper(object):
 
     @classmethod
-    def first_parse_response(cls, response, keyword='区块链'):
+    def first_parse_response(cls, response, keyword):
         """
         初步解析response
         :param response: 网页返回的response
@@ -28,10 +28,10 @@ class ParseHelper(object):
             text = html.text
             if cls.is_include_keyword(text, keyword):
                 data = {
-                            'source_url': response.url,
-                            'urls': list(html.absolute_links),
-                            'text': text,
-                            'datetime': str(datetime.now()),
+                    "source_url": response.url,
+                    "urls": list(html.absolute_links),
+                    "text": text,
+                    "datetime": str(datetime.now()),
                 }
                 return data
             else:
@@ -52,4 +52,3 @@ class ParseHelper(object):
             return True
         else:
             return False
-
