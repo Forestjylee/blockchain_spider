@@ -27,7 +27,10 @@ class PresentationSpider(BaseSpider):
             first_parsed_data = self._parse_response(response)
             new_urls = self._extract_new_urls(first_parsed_data)
             queue.put_urls_in_queue(new_urls)
-            pprint(first_parsed_data)
+            if first_parsed_data:
+                pprint(first_parsed_data)
+            else:
+                print(f"{url}中没有关键字[>>>区块链<<<]!")
 
     def start_crawl(self):
         """
