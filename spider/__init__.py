@@ -7,10 +7,12 @@ spider包
 Created by Junyi.
 """
 from url_queue import get_queue_object
-from settings import (KEYWORD, URL_QUEUE_TYPE,
-                      IGNORE_EXCEPTIONS, CRAWL_SPEED)  # TODO 根据爬取速度调节并行进程数
 from utils.decorator import ensure_network_env, deal_exceptions
+from settings import (KEYWORD, URL_QUEUE_TYPE, IGNORE_EXCEPTIONS,
+                      PROCESS_NUMBER, IS_PRESENTATION)
 from .multiprocess_spider import MultiProcessSpider
+from .presentation_spider import PresentationSpider
+from .singleprocess_spider import SingleProcessSpider
 from .start_urls_spider import get_start_urls, build_start_urls_pool
 
 
@@ -43,5 +45,11 @@ def run():
     if queue.is_queue_empty():
         build_start_urls_pool(KEYWORD, queue)
     print("起始地址池构建成功，开始爬取...")
-    spider = MultiProcessSpider()
+    if not IS_PRESENTATION:
+        if PROCESS_NUMBER > 1:
+            spider = MultiProcessSpider(PROCESS_NUMBER)
+        else:
+            spider = SingleProcessSpider()
+    else:
+        spider = PresentationSpider(PROCESS_NUMBER)
     spider.start_crawl()
