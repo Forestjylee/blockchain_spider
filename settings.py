@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-爬虫的配置文件
+爬虫配置文件
 @file: settings.py
 @time: 2018/12/1 9:50
 Created by Junyi.
@@ -10,7 +10,7 @@ Created by Junyi.
 # 爬取的关键字[必填！！！]
 KEYWORD = '区块链'
 
-# 是否开启展示模式
+# 是否开启展示模式(不存储爬取的数据,只输出到控制台)
 IS_PRESENTATION = True
 
 # 并行执行的进程数(_<=1即为单进程)
