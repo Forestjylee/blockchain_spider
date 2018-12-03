@@ -7,7 +7,47 @@
 ## 1.项目文件目录
 
 ```powershell
-
+    blockchain_spider
+    ├─ Pipfile
+    ├─ Pipfile.lock
+    ├─ README.md
+    ├─ run_spider.py
+    ├─ settings.py
+    ├─ tree.txt
+    ├─ __init__.py
+    │          
+    ├─pipline
+    │  ├─ mongo_pipline.py
+    │  ├─ normal_pipline.py
+    │  └─ __init__.py
+    │          
+    ├─spider
+    │  ├─ base_spider.py
+    │  ├─ multiprocess_spider.py
+    │  ├─ presentation_spider.py
+    │  ├─ singleprocess_spider.py
+    │  ├─ start_urls_spider.py
+    │  └─ __init__.py
+    │          
+    ├─test
+    │  ├─ test_pipline.py
+    │  ├─ test_spider.py
+    │  ├─ test_start_urls_spider.py
+    │  └─ test_url_queue.py
+    │                  
+    ├─url_queue
+    │  ├─ normal_queue.py
+    │  ├─ redis_queue.py
+    │  └─ __init__.py
+    │          
+    └─utils
+        ├─ decorator.py
+        ├─ io_helper.py
+        ├─ log_helper.py
+        ├─ parse_helper.py
+        ├─ requests_helper.py
+        ├─ start_urls_helper.py
+        └─ __init__.py
 ```
 
 
