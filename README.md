@@ -6,34 +6,9 @@
 
 ## 1.项目文件目录
 
-│  \__init__.py
-│  Pipfile
-│  Pipfile.lock
-│  run_spider.py
-│
-├─pipline
-│  │  mongo_pipline.py
-│  │  normal_pipline.py
-│  │  \__init__.py
-│ 
-├─spider
-│  │  multiprocess_spider.py
-│  │  start_urls_spider.py
-│  │  \__init__.py
-│
-├─url_queue
-│  │  normal_queue.py
-│  │  redis_queue.py
-│  │  \__init__.py
-│
-└─utils
-    │  decorator.py
-    │  io_helper.py
-    │  log_helper.py
-    │  parse_helper.py
-    │  requests_helper.py
-    │  start_urls_helper.py
-    │  \__init__.py
+```powershell
+
+```
 
 
 
@@ -62,6 +37,7 @@
 ```python
 >>> pipenv graph
 >>>
+coverage==4.5.2
 pymongo==3.7.2
 redis==2.10.6
 requests-html==0.9.0
@@ -85,6 +61,16 @@ requests-html==0.9.0
     - urllib3 [required: >=1.21.1,<1.25, installed: 1.24]
   - w3lib [required: Any, installed: 1.19.0]
     - six [required: >=1.4.1, installed: 1.11.0]
+pytest==4.0.1
+  - atomicwrites [required: >=1.0, installed: 1.2.1]
+  - attrs [required: >=17.4.0, installed: 18.2.0]
+  - colorama [required: Any, installed: 0.4.1]
+  - more-itertools [required: >=4.0.0, installed: 4.3.0]
+    - six [required: >=1.0.0,<2.0.0, installed: 1.11.0]
+  - pluggy [required: >=0.7, installed: 0.8.0]
+  - py [required: >=1.5.0, installed: 1.7.0]
+  - setuptools [required: Any, installed: 40.4.3]
+  - six [required: >=1.10.0, installed: 1.11.0]
 ```
 
 ##### [↑↑↑上面输出的是v0.1版本的外部依赖信息↑↑↑]
@@ -140,27 +126,28 @@ requests-html==0.9.0
 
 ### 3.3运行爬虫
 
-##### （高性能版本）在blockchain_spider文件夹中打开cmd,输入：
+##### 打开cmd控制台，激活虚拟环境：
 
 ```python
->>> pipenv run run_spider.py
+>>> cd blockchain_spider
+>>> pipenv shell
 ```
 
-##### （展示版本）在blockchain_spider文件夹中打开cmd，输入：
+##### 在settings.py中配置好之后，输入以下命令运行爬虫：
 
 ```python
->>> pipenv run run_test_spider.py
+(blockchain_spider)>>> python run_spider.py
 ```
 
 ##### 或者可以在其他地方通过导入blockchain_spider包来运行,新建一个run.py文件：
 
 ```python
 # @file: run.py
-from blockchain_spider import run_spider
+from blockchain_spider import spider_run
 
 
 if __name__ == '__main__':
-    run_spider('区块链')
+    spider_run()
 ```
 
 
@@ -178,7 +165,7 @@ if __name__ == '__main__':
 
 ##### 每成功爬取一个url，就在控制台中输出：
 
-```
+```powershell
 [2018/11/01 5:01:00 PM] INFO: URL is crawled.
 [2018/11/01 5:01:01 PM] INFO: There are XXX urls in queue now.
 ```
@@ -189,12 +176,12 @@ if __name__ == '__main__':
 
 ##### 会自动在运行目录下生成2个日志文件
 
-```
+```diff
 ./2018-XX-XX-spider.log
 ./2018-XX-XX-requests.log
 ```
 
-##### 分别记录了爬取url的情况和发起请求的情况
+##### 分别记录了爬取url的情况和http请求的情况
 
 
 
