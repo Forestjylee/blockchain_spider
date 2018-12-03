@@ -13,7 +13,6 @@
     ├─ README.md
     ├─ run_spider.py
     ├─ settings.py
-    ├─ tree.txt
     ├─ __init__.py
     │          
     ├─pipline
