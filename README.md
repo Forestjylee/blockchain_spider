@@ -7,7 +7,7 @@
 ## 1.项目文件目录
 
 ```powershell
-    blockchain_spider
+blockchain_spider
     ├─ Pipfile
     ├─ Pipfile.lock
     ├─ README.md
@@ -191,7 +191,7 @@ if __name__ == '__main__':
 
 
 ```python
->>> python run.py
+(blockchain_spider)>>> python run.py
 ```
 
 
