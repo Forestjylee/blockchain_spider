@@ -10,8 +10,11 @@ Created by Junyi.
 # 爬取的关键字[必填！！！]
 KEYWORD = '区块链'
 
-# 爬虫爬取速度[slow|fast|super_fast]
-CRAWL_SPEED = 'super_fast'
+# 是否开启展示模式
+IS_PRESENTATION = True
+
+# 并行执行的进程数(_<=1即为单进程)
+PROCESS_NUMBER = 7
 
 
 ########################起始地址池模块##########################
@@ -75,9 +78,6 @@ URL_QUEUE_NAME = 'blockchain_urls'
 
 
 #############################其他##############################
-
-# 并行执行的进程数
-PROCESS_NUMBER = 7
 
 # 单次http请求超时时间(/s)
 TIMEOUT = 3
